@@ -5,9 +5,9 @@ import { Appointments } from "@/app/(public)/_components/appointments";
 import { BookAppointmentButton } from "@/components/book-appointment-button";
 
 interface DoctorPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const DoctorDetailsPage = async ({ params }: DoctorPageProps) => {

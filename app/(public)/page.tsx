@@ -27,7 +27,7 @@ import { Hospital, Specialty } from "@prisma/client";
 import { DoctorCard } from "@/app/(public)/_components/doctor-card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const specialtyOptions = [
+const specialtyOptions = [
   "Cardiology",
   "Dermatology",
   "Neurology",
@@ -46,9 +46,9 @@ export const specialtyOptions = [
   "ENT",
   "Nutrition",
   "Healthcare",
-] as const;
+];
 
-export const hospitalOptions = [
+const hospitalOptions = [
   "Hospital1",
   "Hospital2",
   "Hospital3",
@@ -62,7 +62,7 @@ export const hospitalOptions = [
   "Hospital11",
   "Hospital12",
   "Hospital13",
-] as const;
+];
 
 interface Doctor {
   id: string;
