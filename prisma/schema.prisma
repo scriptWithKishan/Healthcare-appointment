@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  // directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum Specialty {
+  Cardiology
+  Dermatology
+  Neurology
+  Pediatrics
+  Orthopedics
+  Surgery
+  Urology
+  Allergies
+  Immunology
+  Psychiatry
+  Gastroenterology
+  Anesthesiology
+  Oncology
+  Radiology
+  Medicine
+  ENT
+  Nutrition
+  Healthcare
+}
+
+enum Hospital {
+  Hospital1
+  Hospital2
+  Hospital3
+  Hospital4
+  Hospital5
+  Hospital6
+  Hospital7
+  Hospital8
+  Hospital9
+  Hospital10
+  Hospital11
+  Hospital12
+  Hospital13
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum TimeSlot {
+  Morning
+  Afternoon
+  Evening
+}
+
+model Doctor {
+  id           String        @id @default(uuid())
+  name         String
+  specialty    Specialty
+  hospital     Hospital
+  email        String        @unique
+  gender       Gender        @default(Male)
+  profileImg   String?
+  description  String?
+  phone        String?
+  experience   Int
+  appointments Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Appointment {
+  id           String   @id @default(uuid())
+  doctorId     String
+  doctor       Doctor   @relation(fields: [doctorId], references: [id])
+  patientName  String
+  patientEmail String
+  patientPhone String
+  date         DateTime
+  timeSlot     TimeSlot
+
+  createdAt DateTime @default(now())
+}
