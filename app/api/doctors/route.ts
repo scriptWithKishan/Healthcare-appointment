@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { Hospital, Specialty } from "@prisma/client";
 import { FilterSchema } from "@/schemas";
 
 export async function GET(req: NextRequest) {
@@ -7,7 +8,6 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const rawParams = Object.fromEntries(searchParams.entries());
 
-    // Parse the parameters with error handling
     const parseResult = FilterSchema.safeParse(rawParams);
 
     if (!parseResult.success) {
@@ -22,8 +22,14 @@ export async function GET(req: NextRequest) {
 
     const { specialty, hospital, search } = parseResult.data;
 
-    // Build the where clause more carefully
-    const whereClause: any = {};
+    const whereClause: {
+      specialty?: Specialty;
+      hospital?: Hospital;
+      name?: {
+        contains: string;
+        mode: "insensitive";
+      };
+    } = {};
 
     if (specialty) {
       whereClause.specialty = specialty;
