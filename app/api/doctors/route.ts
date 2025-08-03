@@ -1,29 +1,52 @@
 import { db } from "@/lib/db";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { FilterSchema } from "@/schemas";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+  try {
+    const { searchParams } = new URL(req.url);
+    const rawParams = Object.fromEntries(searchParams.entries());
 
-  const rawParams = Object.fromEntries(searchParams.entries());
+    // Parse the parameters with error handling
+    const parseResult = FilterSchema.safeParse(rawParams);
 
-  const parsed = FilterSchema.parse(rawParams);
+    if (!parseResult.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid request parameters",
+          details: parseResult.error.issues,
+        },
+        { status: 400 }
+      );
+    }
 
-  if (!parsed) {
-    return new Response("Invalid request parameters", {
-      status: 400,
+    const { specialty, hospital, search } = parseResult.data;
+
+    // Build the where clause more carefully
+    const whereClause: any = {};
+
+    if (specialty) {
+      whereClause.specialty = specialty;
+    }
+
+    if (hospital) {
+      whereClause.hospital = hospital;
+    }
+
+    if (search) {
+      whereClause.name = { contains: search, mode: "insensitive" };
+    }
+
+    const doctors = await db.doctor.findMany({
+      where: whereClause,
     });
+
+    return NextResponse.json(doctors);
+  } catch (error) {
+    console.error("API Error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
-
-  const { specialty, hospital, search } = parsed;
-
-  const doctors = await db.doctor.findMany({
-    where: {
-      specialty: specialty ? specialty : undefined,
-      hospital: hospital ? hospital : undefined,
-      name: { contains: search, mode: "insensitive" },
-    },
-  });
-
-  return new Response(JSON.stringify(doctors));
 }
